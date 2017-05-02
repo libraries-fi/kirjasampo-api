@@ -32,7 +32,8 @@
         "incenteev/composer-parameter-handler": "^2.0",
         "dunglas/action-bundle": "^0.3",
         "nelmio/cors-bundle": "^1.4",
-        "phpdocumentor/reflection-docblock": "^3.0"
+        "phpdocumentor/reflection-docblock": "^3.0",
+        "easyrdf/easyrdf": "^0.9.1"
     },
     "require-dev": {
         "api-platform/schema-generator": "^1.2",

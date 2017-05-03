@@ -36,10 +36,48 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
         $data = new EasyRdf_Graph();
         $data->parseFile($sourceFile, 'ntriples');
 
-        $data = $data->serialise('json');
+        $triplesCount = $data->countTriples();
 
-        file_put_contents($targetFile, $data);
+        $data = $data->toRdfPhp();
+
+        if (file_exists($targetFile)) {
+            unlink($targetFile);
+        }
+
+        $line = '';
+
+        foreach ($data as $subject => $predicateArray) {
+            foreach ($predicateArray as $predicate => $objectArray) {
+                $line = json_encode([
+                    'index' => [
+                        '_index' => 'books',
+                        '_type'  => 'book',
+                    ],
+                ]);
+
+                // Separate the action and document with a new line.
+                $line .= PHP_EOL;
+
+                $triple = [
+                    'subject'   => $subject,
+                    'predicate' => $predicate,
+                    'object'    => $objectArray[0]['value'],
+                ];
+
+                if (isset($objectArray[0]['lang'])) {
+                    $triple['lang'] = $objectArray[0]['lang'];
+                }
+
+                $line .= json_encode($triple);
+            }
+
+            // End the current document with a new line.
+            $line .= PHP_EOL;
+
+            file_put_contents($targetFile, $line, FILE_APPEND);
+        }
 
         $output->writeln('<info>The output JSON file has been written to ' . $targetFile . '.</info>');
+        $output->writeln('<info>' . $triplesCount . ' triples were converted.</info>');
     }
 }

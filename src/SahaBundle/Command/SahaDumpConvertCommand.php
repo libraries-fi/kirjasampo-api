@@ -44,37 +44,37 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
             unlink($targetFile);
         }
 
-        $line = '';
+        foreach ($data as $subject => $predicates) {
+            foreach ($predicates as $predicate => $objects) {
+                foreach ($objects as $object) {
+                    $line = json_encode([
+                        'index' => [
+                            '_index' => 'books',
+                            '_type'  => 'book',
+                        ],
+                    ]);
 
-        foreach ($data as $subject => $predicateArray) {
-            foreach ($predicateArray as $predicate => $objectArray) {
-                $line = json_encode([
-                    'index' => [
-                        '_index' => 'books',
-                        '_type'  => 'book',
-                    ],
-                ]);
+                    // Separate the action and document with a new line.
+                    $line .= PHP_EOL;
 
-                // Separate the action and document with a new line.
-                $line .= PHP_EOL;
+                    $triple = [
+                        'subject'   => $subject,
+                        'predicate' => $predicate,
+                        'object'    => $object['value'],
+                    ];
 
-                $triple = [
-                    'subject'   => $subject,
-                    'predicate' => $predicate,
-                    'object'    => $objectArray[0]['value'],
-                ];
+                    if (isset($object['lang'])) {
+                        $triple['lang'] = $object['lang'];
+                    }
 
-                if (isset($objectArray[0]['lang'])) {
-                    $triple['lang'] = $objectArray[0]['lang'];
+                    $line .= json_encode($triple);
+
+                    // End the current document with a new line.
+                    $line .= PHP_EOL;
+
+                    file_put_contents($targetFile, $line, FILE_APPEND);
                 }
-
-                $line .= json_encode($triple);
             }
-
-            // End the current document with a new line.
-            $line .= PHP_EOL;
-
-            file_put_contents($targetFile, $line, FILE_APPEND);
         }
 
         $output->writeln('<info>The output JSON file has been written to ' . $targetFile . '.</info>');

@@ -15,7 +15,7 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
     {
         $this
             ->setName('saha:dump:convert')
-            ->setDescription('Convert a Saha dump file to JSON')
+            ->setDescription('Convert files created with saha:dump:split into JSON')
             ->addArgument('file', InputArgument::REQUIRED, 'A path to the .nq dump file');
     }
 
@@ -33,51 +33,59 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
             $targetFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . basename($sourceFile, '.nq') . '.json';
         }
 
-        $data = new EasyRdf_Graph();
-        $data->parseFile($sourceFile, 'ntriples');
+        $triplesCount = 0;
+        $fileNumber   = 0;
 
-        $triplesCount = $data->countTriples();
+        // Add a left padding of 4 zeroes required by the split command.
+        while (file_exists($sourceFile . str_pad($fileNumber, 4, '0', STR_PAD_LEFT))) {
+            $fileSuffix = str_pad($fileNumber, 4, '0', STR_PAD_LEFT);
+            $data       = new EasyRdf_Graph();
+            $data->parseFile($sourceFile . $fileSuffix, 'ntriples');
 
-        $data = $data->toRdfPhp();
+            $triplesCount += $data->countTriples();
 
-        if (file_exists($targetFile)) {
-            unlink($targetFile);
-        }
+            $data = $data->toRdfPhp();
 
-        foreach ($data as $subject => $predicates) {
-            foreach ($predicates as $predicate => $objects) {
-                foreach ($objects as $object) {
-                    $line = json_encode([
-                        'index' => [
-                            '_index' => 'books',
-                            '_type'  => 'book',
-                        ],
-                    ]);
+            foreach ($data as $subject => $predicates) {
+                foreach ($predicates as $predicate => $objects) {
+                    foreach ($objects as $object) {
+                        $line = json_encode([
+                            'index' => [
+                                '_index' => 'books',
+                                '_type'  => 'book',
+                            ],
+                        ]);
 
-                    // Separate the action and document with a new line.
-                    $line .= PHP_EOL;
+                        // Separate the action and document with a new line.
+                        $line .= PHP_EOL;
 
-                    $triple = [
-                        'subject'   => $subject,
-                        'predicate' => $predicate,
-                        'object'    => $object['value'],
-                    ];
+                        $triple = [
+                            'subject'   => $subject,
+                            'predicate' => $predicate,
+                            'object'    => $object['value'],
+                        ];
 
-                    if (isset($object['lang'])) {
-                        $triple['lang'] = $object['lang'];
+                        if (isset($object['lang'])) {
+                            $triple['lang'] = $object['lang'];
+                        }
+
+                        $line .= json_encode($triple);
+
+                        // End the current document with a new line.
+                        $line .= PHP_EOL;
+
+                        if (file_exists($targetFile)) {
+                            unlink($targetFile);
+                        }
+
+                        file_put_contents($targetFile . $fileSuffix, $line, FILE_APPEND);
                     }
-
-                    $line .= json_encode($triple);
-
-                    // End the current document with a new line.
-                    $line .= PHP_EOL;
-
-                    file_put_contents($targetFile, $line, FILE_APPEND);
                 }
             }
+
+            $fileNumber++;
         }
 
-        $output->writeln('<info>The output JSON file has been written to ' . $targetFile . '.</info>');
         $output->writeln('<info>' . $triplesCount . ' triples were converted.</info>');
     }
 }

@@ -1,0 +1,89 @@
+<?php namespace Nord\ElasticsearchBundle\Pagerfanta\Adapter;
+
+use Nord\ElasticsearchBundle\Contracts\ElasticsearchServiceContract;
+use Nord\ElasticsearchBundle\Search\Search;
+use Pagerfanta\Adapter\AdapterInterface;
+
+class ElasticsearchAdapter implements AdapterInterface
+{
+    /**
+     * @var ElasticsearchServiceContract
+     */
+    private $elasticsearch;
+
+    /**
+     * @var Search
+     */
+    private $search;
+
+    /**
+     * @var array
+     */
+    private $result;
+
+
+    /**
+     * @param ElasticsearchServiceContract $elasticsearch
+     * @param Search $search
+     */
+    public function __construct(ElasticsearchServiceContract $elasticsearch, Search $search)
+    {
+        $this->elasticsearch = $elasticsearch;
+        $this->search = $search;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getNbResults()
+    {
+        $result = $this->getResult();
+        return isset($result['hits']['total']) ? $result['hits']['total'] : 0;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getSlice($offset, $length)
+    {
+        $result = $this->getResult($offset, $length);
+        return isset($result['hits']['hits']) ? $result['hits']['hits'] : [];
+    }
+
+
+    /**
+     * @param int|null $offset
+     * @param int|null $length
+     * @return array
+     */
+    public function getResult($offset = null, $length = null)
+    {
+        if (!is_null($offset) && !is_null($length)) {
+            $page = ($offset / $length) + 1;
+            $size = $length;
+            if ($page !== $this->search->getPage() || $size !== $this->search->getSize()) {
+                $this->result = null;
+                $this->search->setPage($page)
+                    ->setSize($size);
+            }
+        }
+
+        if (empty($this->result)) {
+            $this->result = $this->elasticsearch->execute($this->search);
+        }
+
+        return $this->result;
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getAggregations()
+    {
+        $result = $this->getResult();
+        return isset($result['aggregations']) ? $result['aggregations'] : [];
+    }
+}

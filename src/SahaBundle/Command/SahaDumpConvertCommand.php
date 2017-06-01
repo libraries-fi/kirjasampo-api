@@ -2,6 +2,7 @@
 
 namespace SahaBundle\Command;
 
+use ML\JsonLD\JsonLD;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -38,49 +39,32 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
 
         // Add a left padding of 4 zeroes required by the split command.
         while (file_exists($sourceFile . str_pad($fileNumber, 4, '0', STR_PAD_LEFT))) {
+            $output->writeln('file: ' . $sourceFile . str_pad($fileNumber, 4, '0', STR_PAD_LEFT));
             $fileSuffix = str_pad($fileNumber, 4, '0', STR_PAD_LEFT);
             $data       = new EasyRdf_Graph();
             $data->parseFile($sourceFile . $fileSuffix, 'ntriples');
 
             $triplesCount += $data->countTriples();
 
-            $data = $data->toRdfPhp();
+            $data = json_decode($data->serialise('jsonld'), true);
 
-            foreach ($data as $subject => $predicates) {
-                foreach ($predicates as $predicate => $objects) {
-                    foreach ($objects as $object) {
-                        $line = json_encode([
-                            'index' => [
-                                '_index' => 'books',
-                                '_type'  => 'book',
-                            ],
-                        ]);
+            foreach ($data as $graph) {
+                $line = json_encode([
+                    'index' => [
+                        '_index' => 'books',
+                        '_type'  => 'book',
+                    ],
+                ]);
 
-                        // Separate the action and document with a new line.
-                        $line .= PHP_EOL;
+                // Separate the action and document with a new line.
+                $line .= PHP_EOL;
 
-                        $triple = [
-                            'subject'   => $subject,
-                            'predicate' => $predicate,
-                            'object'    => $object['value'],
-                        ];
+                $line .= JsonLD::toString($graph);
 
-                        if (isset($object['lang'])) {
-                            $triple['lang'] = $object['lang'];
-                        }
+                // End the current document with a new line.
+                $line .= PHP_EOL;
 
-                        $line .= json_encode($triple);
-
-                        // End the current document with a new line.
-                        $line .= PHP_EOL;
-
-                        if (file_exists($targetFile)) {
-                            unlink($targetFile);
-                        }
-
-                        file_put_contents($targetFile . $fileSuffix, $line, FILE_APPEND);
-                    }
-                }
+                file_put_contents($targetFile . $fileSuffix, $line, FILE_APPEND);
             }
 
             $fileNumber++;

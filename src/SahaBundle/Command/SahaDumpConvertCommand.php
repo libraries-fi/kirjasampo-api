@@ -39,7 +39,6 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
 
         // Add a left padding of 4 zeroes required by the split command.
         while (file_exists($sourceFile . str_pad($fileNumber, 4, '0', STR_PAD_LEFT))) {
-            $output->writeln('file: ' . $sourceFile . str_pad($fileNumber, 4, '0', STR_PAD_LEFT));
             $fileSuffix = str_pad($fileNumber, 4, '0', STR_PAD_LEFT);
             $data       = new EasyRdf_Graph();
             $data->parseFile($sourceFile . $fileSuffix, 'ntriples');

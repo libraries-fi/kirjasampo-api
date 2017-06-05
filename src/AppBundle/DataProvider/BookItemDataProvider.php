@@ -22,9 +22,11 @@ final class BookItemDataProvider implements ItemDataProviderInterface
 
         $queryBuilder = $service->createQueryBuilder();
 
-        $query = $queryBuilder->createTermQuery()
-                              ->setField('_id')
-                              ->setValue($id);
+        $query = $queryBuilder->createBoolQuery()
+                              ->addShould(
+                                  $queryBuilder->createTermQuery()
+                                               ->setField('_id')
+                                               ->setValue($id));
 
         $search = $service->createSearch()
                           ->setIndex('books')
@@ -37,4 +39,5 @@ final class BookItemDataProvider implements ItemDataProviderInterface
 
         return $result['hits']['hits'];
     }
+
 }

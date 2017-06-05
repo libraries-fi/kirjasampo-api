@@ -10,17 +10,17 @@ class BookController extends Controller
 {
 
     /**
-     * @Route("/{uuid}")
+     * @Route("/{id}")
      *
-     * @param $uuid
+     * @param id
      *
      * @return null|object
      */
-    public function showAction($uuid)
+    public function showAction($id)
     {
         $dataProvider = new BookItemDataProvider();
 
-        return $dataProvider->getItem('Book', $uuid);
+        return $dataProvider->getItem('Book', $id);
     }
 
     /**

@@ -3,5 +3,5 @@ api:
     type:     'api_platform'
 
 app:
-    resource: '@AppBundle/Action/'
+    resource: '@AppBundle/Controller/'
     type:     'annotation'

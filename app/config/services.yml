@@ -1,8 +1,15 @@
 parameters:
 
 services:
-  book.item_data_provider:
-    class: 'AppBundle\DataProvider\BookItemDataProvider'
+  document.item_data_provider:
+    class: 'AppBundle\DataProvider\DocumentItemDataProvider'
     public: true
+    autowire: true
     tags:
       -  { name: 'api_platform.item_data_provider' }
+  document.item_data_provider:
+    class: 'AppBundle\DataProvider\DocumentCollectionDataProvider'
+    public: true
+    autowire: true
+    tags:
+      -  { name: 'api_platform.collection_data_provider' }

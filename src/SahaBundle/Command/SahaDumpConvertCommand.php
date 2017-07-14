@@ -40,6 +40,9 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
         // Add a left padding of 4 zeroes required by the split command.
         while (file_exists($sourceFile . str_pad($fileNumber, 4, '0', STR_PAD_LEFT))) {
             $fileSuffix = str_pad($fileNumber, 4, '0', STR_PAD_LEFT);
+
+            //$output->writeln('Converting ' . $sourceFile . $fileSuffix . ' to ' . $targetFile . $fileSuffix);
+
             $data       = new EasyRdf_Graph();
             $data->parseFile($sourceFile . $fileSuffix, 'ntriples');
 
@@ -50,8 +53,8 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
             foreach ($data as $graph) {
                 $line = json_encode([
                     'index' => [
-                        '_index' => 'books',
-                        '_type'  => 'book',
+                        '_index' => 'kirjasampo',
+                        '_type'  => 'item',
                     ],
                 ]);
 

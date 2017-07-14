@@ -2,19 +2,19 @@
 
 namespace AppBundle\DataProvider;
 
-use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use AppBundle\Entity\Document;
+use ApiPlatform\Core\DataProvider\ItemDataProviderInterface;
 use Elasticsearch\ClientBuilder;
 use Nord\ElasticsearchBundle\ElasticsearchService;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 final class DocumentItemDataProvider implements ItemDataProviderInterface
 {
 
     /**
-     * @var Request
+     * @var RequestStack
      */
-    private $request;
+    private $requestStack;
 
     /**
      * @var ElasticsearchService
@@ -23,10 +23,11 @@ final class DocumentItemDataProvider implements ItemDataProviderInterface
 
     /**
      * DocumentItemDataProvider constructor.
+     * @param RequestStack $requestStack
      */
-    public function __construct(Request $request)
+    public function __construct(RequestStack $requestStack)
     {
-        $this->request = $request;
+        $this->requestStack = $requestStack;
 
         $client        = ClientBuilder::create()->build();
         $this->service = new ElasticsearchService($client);
@@ -52,15 +53,17 @@ final class DocumentItemDataProvider implements ItemDataProviderInterface
                                                ->setValue($id));
 
         $search = $this->service->createSearch()
-                                ->setIndex('books')
-                                ->setType('book')
+                                ->setIndex('kirjasampo')
+                                ->setType('item')
                                 ->setQuery($query)
                                 ->setSize(1)
                                 ->setPage(1);
 
         $result = $this->service->execute($search);
 
-        return [new Document($result['hits']['hits'])];
+        //return [new Document($result['hits']['hits'])];
+
+        return $result['hits']['hits'];
     }
 
     /**
@@ -71,16 +74,18 @@ final class DocumentItemDataProvider implements ItemDataProviderInterface
      *
      * @return mixed
      */
-    public function searchItems(string $resourceClass, $id, string $operationName = null, array $context = [])
+    public function searchItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
         $queryBuilder = $this->service->createQueryBuilder();
+
+        //$request = $this->requestStack->getCurrentRequest();
 
         // TODO: Construct the search query here.
         $query = $queryBuilder->createBoolQuery();
 
         $search = $this->service->createSearch()
-                                ->setIndex('books')
-                                ->setType('book')
+                                ->setIndex('kirjasampo')
+                                ->setType('item')
                                 ->setQuery($query)
                                 ->setSize(1)
                                 ->setPage(1);

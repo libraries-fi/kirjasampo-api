@@ -80,3 +80,10 @@ nelmio_cors:
         max_age:        3600
     paths:
         '^/': ~
+
+api_platform:
+    collection:
+        pagination:
+            enabled: true
+            page_parameter_name: _page
+            items_per_page: 50

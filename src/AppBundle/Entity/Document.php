@@ -7,18 +7,27 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @ApiResource
+ * @ApiResource(attributes={
+ *     "pagination_items_per_page"=50
+ * },
+ * collectionOperations={
+ *     "get"={"method"="GET"},
+ *     "search"={"route_name"="search"}
+ * },
+ * itemOperations={
+ *     "get"={"method"="GET"}
+ * })
  * @ORM\Entity
  */
 class Document
 {
 
     /**
-     * @var int
+     * @var string
      *
      * @ORM\Id
      * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="string")
      */
     private $id;
     /**
@@ -32,12 +41,23 @@ class Document
     /**
      * Book constructor.
      *
+     * @param string $id
      * @param array $content
      */
-    public function __construct($content)
+    public function __construct($id, $content)
     {
-        $this->id      = 1;
+        $this->id      = $id;
         $this->content = $content;
+    }
+
+    /**
+     * Get id
+     *
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 
     /**

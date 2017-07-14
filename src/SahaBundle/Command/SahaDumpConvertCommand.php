@@ -51,12 +51,17 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
             $data = json_decode($data->serialise('jsonld'), true);
 
             foreach ($data as $graph) {
-                $line = json_encode([
+                $action = [
                     'index' => [
                         '_index' => 'kirjasampo',
                         '_type'  => 'item',
                     ],
-                ]);
+                ];
+                if( isset($graph['@id'])){
+                    $action['index']['_id'] = $graph['@id'];
+                }
+                $line = json_encode($action);
+
 
                 // Separate the action and document with a new line.
                 $line .= PHP_EOL;

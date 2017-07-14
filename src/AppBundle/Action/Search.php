@@ -19,7 +19,7 @@ class Search
     /**
      * @Route(
      *     name="search",
-     *     path="/documents/search/",
+     *     path="search",
      *     defaults={"_api_resource_class"=Document::class, "_api_collection_operation_name"="search"}
      * )
      * @Method("GET")

@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *     "search"={"route_name"="search"}
  * },
  * itemOperations={
- *     "get"={"method"="GET"}
+ *     "get"={"route_name"="api_documents_get_item"},
  * })
  * @ORM\Entity
  */

@@ -14,3 +14,14 @@ services:
     autowire: true
     tags:
       -  { name: 'api_platform.item_data_provider' }
+  document.item_normalizer:
+    public: false
+    class: 'AppBundle\Serializer\DocumentItemNormalizer'
+    arguments:
+      - '@api_platform.metadata.resource.metadata_factory'
+      - '@api_platform.iri_converter'
+      - '@api_platform.resource_class_resolver'
+      - '@api_platform.jsonld.context_builder'
+
+    tags:
+      - { name: 'serializer.normalizer', priority: 10 }

@@ -59,11 +59,13 @@ final class DocumentItemDataProvider implements ItemDataProviderInterface
                                 ->setSize(1)
                                 ->setPage(1);
 
-        $result = $this->service->execute($search);
+        $result = $this->service->execute($search)['hits']['hits'];
 
-        //return [new Document($result['hits']['hits'])];
-
-        return $result['hits']['hits'];
+        if($result) {
+            return new Document($result[0]['_id'], $result[0]['_source']);
+        } else {
+            return null;
+        }
     }
 
     /**

@@ -4,6 +4,7 @@ use Nord\ElasticsearchBundle\Search\Query\Compound\BoolQuery;
 use Nord\ElasticsearchBundle\Search\Query\Compound\FunctionScoreQuery;
 use Nord\ElasticsearchBundle\Search\Query\FullText\MatchQuery;
 use Nord\ElasticsearchBundle\Search\Query\FullText\MultiMatchQuery;
+use Nord\ElasticsearchBundle\Search\Query\FullText\QueryStringQuery;
 use Nord\ElasticsearchBundle\Search\Query\Geo\GeoDistanceQuery;
 use Nord\ElasticsearchBundle\Search\Query\Joining\HasChildQuery;
 use Nord\ElasticsearchBundle\Search\Query\Joining\HasParentQuery;
@@ -12,6 +13,8 @@ use Nord\ElasticsearchBundle\Search\Query\TermLevel\ExistsQuery;
 use Nord\ElasticsearchBundle\Search\Query\TermLevel\RangeQuery;
 use Nord\ElasticsearchBundle\Search\Query\TermLevel\TermQuery;
 use Nord\ElasticsearchBundle\Search\Query\TermLevel\TermsQuery;
+use Nord\ElasticsearchBundle\Search\Query\TermLevel\WildcardQuery;
+use Nord\ElasticsearchBundle\Search\Query\TermLevel\RegexpQuery;
 
 class QueryBuilder
 {
@@ -52,6 +55,15 @@ class QueryBuilder
 
 
     /**
+     * @return QueryStringQuery
+     */
+    public function createQueryStringQuery()
+    {
+        return new QueryStringQuery();
+    }
+
+
+    /**
      * @return TermQuery
      */
     public function createTermQuery()
@@ -66,6 +78,24 @@ class QueryBuilder
     public function createTermsQuery()
     {
         return new TermsQuery();
+    }
+
+
+    /**
+     * @return WildcardQuery
+     */
+    public function createWildcardQuery()
+    {
+        return new WildcardQuery();
+    }
+
+
+    /**
+     * @return RegexpQuery
+     */
+    public function createRegexpQuery()
+    {
+        return new RegexpQuery();
     }
 
 

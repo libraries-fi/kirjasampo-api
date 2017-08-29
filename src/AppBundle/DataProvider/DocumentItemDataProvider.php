@@ -43,14 +43,12 @@ final class DocumentItemDataProvider implements ItemDataProviderInterface
      */
     public function getItem(string $resourceClass, $id, string $operationName = null, array $context = [])
     {
-
         $queryBuilder = $this->service->createQueryBuilder();
 
         $query = $queryBuilder->createBoolQuery()
                               ->addMust(
-                                  $queryBuilder->createMatchQuery()
-                                               ->setField('_id')
-                                               ->setValue($id));
+                                  $queryBuilder->createQueryStringQuery()
+                                               ->setQuery('"' . urldecode(strtolower($id)) . '"'));
 
         $search = $this->service->createSearch()
                                 ->setIndex('kirjasampo')
@@ -62,39 +60,13 @@ final class DocumentItemDataProvider implements ItemDataProviderInterface
         $result = $this->service->execute($search)['hits']['hits'];
 
         if($result) {
+            if (isset($resultItem['_source']['@type'])) {
+                $resultItem['_source']['@contentType'] = $resultItem['_source']['@type'];
+            }
+
             return new Document($result[0]['_id'], $result[0]['_source']);
         } else {
             return null;
         }
     }
-
-    /**
-     * @param string      $resourceClass
-     * @param             $id
-     * @param string|null $operationName
-     * @param array       $context
-     *
-     * @return mixed
-     */
-    public function searchItem(string $resourceClass, $id, string $operationName = null, array $context = [])
-    {
-        $queryBuilder = $this->service->createQueryBuilder();
-
-        //$request = $this->requestStack->getCurrentRequest();
-
-        // TODO: Construct the search query here.
-        $query = $queryBuilder->createBoolQuery();
-
-        $search = $this->service->createSearch()
-                                ->setIndex('kirjasampo')
-                                ->setType('item')
-                                ->setQuery($query)
-                                ->setSize(1)
-                                ->setPage(1);
-
-        $result = $this->service->execute($search);
-
-        return $result['hits']['hits'];
-    }
-
 }

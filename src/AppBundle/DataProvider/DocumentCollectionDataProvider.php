@@ -60,8 +60,13 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
         $request = $this->requestStack->getCurrentRequest();
 
         $queryBuilder = $this->service->createQueryBuilder();
-
         $query = $queryBuilder->createBoolQuery();
+
+        if ($param = $request->query->get('search')) {
+            $query->addMust(
+                $queryBuilder->createQueryStringQuery()
+                    ->setQuery('"' . strtolower($param) . '"'));
+        }
 
         $search = $this->service->createSearch()
                                 ->setIndex('kirjasampo')
@@ -69,26 +74,6 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
                                 ->setQuery($query)
                                 ->setSize((int)$this->getItemsPerPage($resourceClass))
                                 ->setPage((int)$request->query->get('page'));
-
-        $result = $this->service->execute($search);
-
-        return $this->convertResult($result);
-    }
-
-    public function searchCollection()
-    {
-        $request = $this->requestStack->getCurrentRequest();
-
-        $queryBuilder = $this->service->createQueryBuilder();
-
-        $query = $queryBuilder->createBoolQuery();
-
-        $search = $this->service->createSearch()
-            ->setIndex('kirjasampo')
-            ->setType('item')
-            ->setQuery($query)
-            ->setSize(50)
-            ->setPage(1);
 
         $result = $this->service->execute($search);
 
@@ -106,6 +91,10 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
         $entities = [];
 
         foreach ($result['hits']['hits'] as $resultItem) {
+            if (isset($resultItem['_source']['@type'])) {
+                $resultItem['_source']['@contentType'] = $resultItem['_source']['@type'];
+            }
+
             $entities[] = new Document($resultItem['_id'], $resultItem['_source']);
         }
 
@@ -122,6 +111,12 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
         $paginationItemsPerPage = $resourceMetadata->getAttribute('pagination_items_per_page');
+
+        $request = $this->requestStack->getCurrentRequest();
+
+        if ($param = $request->query->get('itemsPerPage')) {
+            $paginationItemsPerPage = $param;
+        }
 
         return ($paginationItemsPerPage > 0) ? $paginationItemsPerPage : $this->paginationItemsPerPage;
     }

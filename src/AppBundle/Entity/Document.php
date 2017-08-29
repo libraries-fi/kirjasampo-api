@@ -8,14 +8,26 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ApiResource(attributes={
- *     "pagination_items_per_page"=50
+ *     "pagination_items_per_page"=50,
+ *     "filters"={"SearchFilter", "PageFilter"}
  * },
  * collectionOperations={
- *     "get"={"method"="GET"},
- *     "search"={"route_name"="search"}
+ *     "get"={"method"="GET"}
  * },
  * itemOperations={
- *     "get"={"route_name"="api_documents_get_item"},
+ *     "get"={
+ *          "route_name"="api_documents_get_item",
+ *          "swagger_context" = {
+ *              "parameters" = {
+ *                  {
+ *                      "name" = "id",
+ *                      "in" = "path",
+ *                      "required" = true,
+ *                      "type" = "string"
+ *                  }
+ *              }
+ *          }
+ *      }
  * })
  * @ORM\Entity
  */

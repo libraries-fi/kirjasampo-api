@@ -1,6 +1,16 @@
 parameters:
 
 services:
+  document.filter.search:
+    class: 'AppBundle\Filter\SearchFilter'
+    autowire: true
+    arguments: [ '@doctrine', '@request_stack', '@?logger', { content: 'Search for string in all fields' } ]
+    tags: [ { name: 'api_platform.filter', id: 'SearchFilter' } ]
+  document.filter.page:
+    class: 'AppBundle\Filter\PageFilter'
+    autowire: true
+    arguments: [ '@doctrine', '@request_stack', '@?logger', { itemsPerPage: 'How many items per page to display', page: 'Which page to show' } ]
+    tags: [ { name: 'api_platform.filter', id: 'PageFilter' } ]
   document.collection_data_provider:
     class: 'AppBundle\DataProvider\DocumentCollectionDataProvider'
     public: true

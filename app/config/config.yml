@@ -29,6 +29,7 @@ framework:
         # http://symfony.com/doc/current/reference/configuration/framework.html#handler-id
         handler_id:  session.handler.native_file
         save_path:   "%kernel.root_dir%/../var/sessions/%kernel.environment%"
+        #save_path:   "/var/lib/php/sessions" # Problems with emptying cache on mac with default value
     fragments:       ~
     http_method_override: true
     assets: ~
@@ -87,3 +88,5 @@ api_platform:
             enabled: true
             page_parameter_name: _page
             items_per_page: 50
+            #client_items_per_page: true
+            #items_per_page_parameter_name: itemsPerPage

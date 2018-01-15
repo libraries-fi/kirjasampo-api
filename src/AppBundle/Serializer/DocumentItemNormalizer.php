@@ -42,7 +42,7 @@ class DocumentItemNormalizer implements NormalizerInterface
 
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
 
-        $data['@id'] = $this->iriConverter->getIriFromItem($object);
+        $data['@id'] = $object->getId();
         $data['@type'] = $resourceMetadata->getIri() ?: $resourceMetadata->getShortName();
 
         $result = $object->getContent();

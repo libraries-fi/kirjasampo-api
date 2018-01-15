@@ -26,6 +26,6 @@ class Search
      */
     public function __invoke()
     {
-        return $this->documentCollectionDataProvider->searchCollection();
+        return $this->documentCollectionDataProvider->getCollection(Document::class);
     }
 }

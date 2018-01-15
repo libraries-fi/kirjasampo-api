@@ -46,6 +46,7 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
         $this->paginationItemsPerPage = $paginationItemsPerPage;
 
         $client        = ClientBuilder::create()->build();
+        $this->client = $client;
         $this->service = new ElasticsearchService($client);
     }
 
@@ -57,6 +58,18 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
      */
     public function getCollection(string $resourceClass, string $operationName = null)
     {
+        // $json = '{
+        //     "query": {
+        //         "query_string": {
+        //             "fields": ["*.@language"],
+        //             "query": "hi"
+        //         }
+        //     }
+        // }';
+        // $params = [
+        //     'body' => $json,
+        // ];
+        // return $this->client->search($params);
         $request = $this->requestStack->getCurrentRequest();
 
         $queryBuilder = $this->service->createQueryBuilder();
@@ -67,6 +80,15 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
                 $queryBuilder->createQueryStringQuery()
                     ->setQuery('"' . strtolower($param) . '"'));
         }
+
+        if ($language = $request->query->get('language')) {
+            $query->addMust(
+                $queryBuilder->createQueryStringQuery()
+                    ->setFields(["*.@language"])
+                    ->setQuery($language)
+            );
+        }
+
 
         $search = $this->service->createSearch()
                                 ->setIndex('kirjasampo')

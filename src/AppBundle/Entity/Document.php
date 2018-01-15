@@ -1,5 +1,4 @@
 <?php
-
 namespace AppBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;

@@ -11,10 +11,10 @@ use Nord\ElasticsearchBundle\Search\Query\Joining\HasParentQuery;
 use Nord\ElasticsearchBundle\Search\Query\Joining\NestedQuery;
 use Nord\ElasticsearchBundle\Search\Query\TermLevel\ExistsQuery;
 use Nord\ElasticsearchBundle\Search\Query\TermLevel\RangeQuery;
+use Nord\ElasticsearchBundle\Search\Query\TermLevel\RegexpQuery;
 use Nord\ElasticsearchBundle\Search\Query\TermLevel\TermQuery;
 use Nord\ElasticsearchBundle\Search\Query\TermLevel\TermsQuery;
 use Nord\ElasticsearchBundle\Search\Query\TermLevel\WildcardQuery;
-use Nord\ElasticsearchBundle\Search\Query\TermLevel\RegexpQuery;
 
 class QueryBuilder
 {
@@ -26,7 +26,6 @@ class QueryBuilder
         return new BoolQuery();
     }
 
-
     /**
      * @return FunctionScoreQuery
      */
@@ -34,7 +33,6 @@ class QueryBuilder
     {
         return new FunctionScoreQuery();
     }
-
 
     /**
      * @return MatchQuery
@@ -44,7 +42,6 @@ class QueryBuilder
         return new MatchQuery();
     }
 
-
     /**
      * @return MultiMatchQuery
      */
@@ -52,7 +49,6 @@ class QueryBuilder
     {
         return new MultiMatchQuery();
     }
-
 
     /**
      * @return QueryStringQuery
@@ -62,7 +58,6 @@ class QueryBuilder
         return new QueryStringQuery();
     }
 
-
     /**
      * @return TermQuery
      */
@@ -70,7 +65,6 @@ class QueryBuilder
     {
         return new TermQuery();
     }
-
 
     /**
      * @return TermsQuery
@@ -80,7 +74,6 @@ class QueryBuilder
         return new TermsQuery();
     }
 
-
     /**
      * @return WildcardQuery
      */
@@ -88,7 +81,6 @@ class QueryBuilder
     {
         return new WildcardQuery();
     }
-
 
     /**
      * @return RegexpQuery
@@ -98,7 +90,6 @@ class QueryBuilder
         return new RegexpQuery();
     }
 
-
     /**
      * @return RangeQuery
      */
@@ -106,7 +97,6 @@ class QueryBuilder
     {
         return new RangeQuery();
     }
-
 
     /**
      * @return ExistsQuery
@@ -116,7 +106,6 @@ class QueryBuilder
         return new ExistsQuery();
     }
 
-
     /**
      * @return GeoDistanceQuery
      */
@@ -124,7 +113,6 @@ class QueryBuilder
     {
         return new GeoDistanceQuery();
     }
-
 
     /**
      * @return NestedQuery
@@ -134,7 +122,6 @@ class QueryBuilder
         return new NestedQuery();
     }
 
-
     /**
      * @return HasChildQuery
      */
@@ -142,7 +129,6 @@ class QueryBuilder
     {
         return new HasChildQuery();
     }
-
 
     /**
      * @return HasParentQuery

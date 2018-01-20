@@ -35,7 +35,6 @@ class QueryStringQuery extends AbstractQuery
      */
     private $boost;
 
-
     /**
      * @inheritdoc
      */
@@ -66,7 +65,6 @@ class QueryStringQuery extends AbstractQuery
         return ['query_string' => $queryString];
     }
 
-
     /**
      * @param string $query
      * @return QueryStringQuery
@@ -77,7 +75,6 @@ class QueryStringQuery extends AbstractQuery
         return $this;
     }
 
-
     /**
      * @return mixed
      */
@@ -85,7 +82,6 @@ class QueryStringQuery extends AbstractQuery
     {
         return $this->query;
     }
-
 
     /**
      * @param string $field
@@ -97,7 +93,6 @@ class QueryStringQuery extends AbstractQuery
         return $this;
     }
 
-
     /**
      * @return string
      */
@@ -105,7 +100,6 @@ class QueryStringQuery extends AbstractQuery
     {
         return $this->default_field;
     }
-
 
     /**
      * @param string $defaultOperator
@@ -117,7 +111,6 @@ class QueryStringQuery extends AbstractQuery
         return $this;
     }
 
-
     /**
      * @return string
      */
@@ -125,7 +118,6 @@ class QueryStringQuery extends AbstractQuery
     {
         return $this->default_operator;
     }
-
 
     /**
      * @param array $fields
@@ -137,7 +129,6 @@ class QueryStringQuery extends AbstractQuery
         return $this;
     }
 
-
     /**
      * @return array
      */
@@ -145,7 +136,6 @@ class QueryStringQuery extends AbstractQuery
     {
         return $this->fields;
     }
-
 
     /**
      * @param float $boost
@@ -159,7 +149,6 @@ class QueryStringQuery extends AbstractQuery
         return $this;
     }
 
-
     /**
      * @return float
      */
@@ -167,7 +156,6 @@ class QueryStringQuery extends AbstractQuery
     {
         return $this->boost;
     }
-
 
     /**
      * @param float $boost

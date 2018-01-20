@@ -49,7 +49,6 @@ class BoolQuery extends AbstractQuery
      */
     private $mustNot = [];
 
-
     /**
      * @param QueryDSL $query
      * @return BoolQuery
@@ -59,7 +58,6 @@ class BoolQuery extends AbstractQuery
         $this->must[] = $query;
         return $this;
     }
-
 
     /**
      * @param QueryDSL $query
@@ -71,7 +69,6 @@ class BoolQuery extends AbstractQuery
         return $this;
     }
 
-
     /**
      * @param QueryDSL $query
      * @return BoolQuery
@@ -82,7 +79,6 @@ class BoolQuery extends AbstractQuery
         return $this;
     }
 
-
     /**
      * @param QueryDSL $query
      * @return BoolQuery
@@ -92,7 +88,6 @@ class BoolQuery extends AbstractQuery
         $this->mustNot[] = $query;
         return $this;
     }
-
 
     /**
      * @inheritdoc

@@ -2,13 +2,13 @@
 
 namespace AppBundle\DataProvider;
 
-use AppBundle\Entity\Document;
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
+use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
+use AppBundle\Entity\Document;
 use Elasticsearch\ClientBuilder;
 use Nord\ElasticsearchBundle\ElasticsearchService;
 use Symfony\Component\HttpFoundation\RequestStack;
-use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 
 final class DocumentCollectionDataProvider implements CollectionDataProviderInterface
 {
@@ -45,7 +45,7 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
         $this->resourceMetadataFactory = $resourceMetadataFactory;
         $this->paginationItemsPerPage = $paginationItemsPerPage;
 
-        $client        = ClientBuilder::create()->build();
+        $client = ClientBuilder::create()->build();
         $this->client = $client;
         $this->service = new ElasticsearchService($client);
     }
@@ -58,18 +58,6 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
      */
     public function getCollection(string $resourceClass, string $operationName = null)
     {
-        // $json = '{
-        //     "query": {
-        //         "query_string": {
-        //             "fields": ["*.@language"],
-        //             "query": "hi"
-        //         }
-        //     }
-        // }';
-        // $params = [
-        //     'body' => $json,
-        // ];
-        // return $this->client->search($params);
         $request = $this->requestStack->getCurrentRequest();
 
         $queryBuilder = $this->service->createQueryBuilder();
@@ -89,13 +77,17 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
             );
         }
 
+        $query->addMust(
+            $queryBuilder->createExistsQuery()
+                ->setField('*.@type')
+        );
 
         $search = $this->service->createSearch()
-                                ->setIndex('kirjasampo')
-                                ->setType('item')
-                                ->setQuery($query)
-                                ->setSize((int)$this->getItemsPerPage($resourceClass))
-                                ->setPage((int)$request->query->get('page'));
+            ->setIndex('kirjasampo')
+            ->setType('item')
+            ->setQuery($query)
+            ->setSize((int) $this->getItemsPerPage($resourceClass))
+            ->setPage((int) $request->query->get('page'));
 
         $result = $this->service->execute($search);
 

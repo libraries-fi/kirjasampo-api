@@ -16,7 +16,6 @@ class ElasticsearchService implements ElasticsearchServiceContract
      */
     private $client;
 
-
     /**
      * ElasticsearchService constructor.
      *
@@ -27,7 +26,6 @@ class ElasticsearchService implements ElasticsearchServiceContract
         $this->client = $client;
     }
 
-
     /**
      * @inheritdoc
      */
@@ -35,7 +33,6 @@ class ElasticsearchService implements ElasticsearchServiceContract
     {
         return $this->client->search($params);
     }
-
 
     /**
      * @inheritdoc
@@ -45,7 +42,6 @@ class ElasticsearchService implements ElasticsearchServiceContract
         return $this->client->index($params);
     }
 
-
     /**
      * @inheritdoc
      */
@@ -53,7 +49,6 @@ class ElasticsearchService implements ElasticsearchServiceContract
     {
         return $this->client->bulk($params);
     }
-
 
     /**
      * @inheritdoc
@@ -63,7 +58,6 @@ class ElasticsearchService implements ElasticsearchServiceContract
         return $this->client->delete($params);
     }
 
-
     /**
      * @inheritdoc
      */
@@ -71,7 +65,6 @@ class ElasticsearchService implements ElasticsearchServiceContract
     {
         return $this->client->create($params);
     }
-
 
     /**
      * @inheritdoc
@@ -81,7 +74,6 @@ class ElasticsearchService implements ElasticsearchServiceContract
         return $this->client->exists($params);
     }
 
-
     /**
      * @inheritdoc
      */
@@ -89,7 +81,6 @@ class ElasticsearchService implements ElasticsearchServiceContract
     {
         return $this->client->indices();
     }
-
 
     /**
      * @inheritdoc
@@ -99,7 +90,6 @@ class ElasticsearchService implements ElasticsearchServiceContract
         return new Search();
     }
 
-
     /**
      * @inheritdoc
      */
@@ -107,7 +97,6 @@ class ElasticsearchService implements ElasticsearchServiceContract
     {
         return new Sort();
     }
-
 
     /**
      * @inheritdoc
@@ -117,7 +106,6 @@ class ElasticsearchService implements ElasticsearchServiceContract
         return new QueryBuilder();
     }
 
-
     /**
      * @inheritdoc
      */
@@ -125,7 +113,6 @@ class ElasticsearchService implements ElasticsearchServiceContract
     {
         return new Sort\SortBuilder();
     }
-
 
     /**
      * @inheritdoc
@@ -135,7 +122,6 @@ class ElasticsearchService implements ElasticsearchServiceContract
         return new SortStringParser($config);
     }
 
-
     /**
      * @inheritdoc
      */
@@ -144,7 +130,6 @@ class ElasticsearchService implements ElasticsearchServiceContract
         return new AggregationBuilder();
     }
 
-
     /**
      * @inheritdoc
      */
@@ -152,8 +137,8 @@ class ElasticsearchService implements ElasticsearchServiceContract
     {
         return $this->search([
             'index' => $search->getIndex(),
-            'type'  => $search->getType(),
-            'body'  => $search->buildBody(),
+            'type' => $search->getType(),
+            'body' => $search->buildBody(),
         ]);
     }
 }

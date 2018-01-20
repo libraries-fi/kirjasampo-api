@@ -12,7 +12,6 @@ class ExistsQuery extends AbstractQuery
      */
     private $field;
 
-
     /**
      * @inheritdoc
      */
@@ -20,7 +19,6 @@ class ExistsQuery extends AbstractQuery
     {
         return ['exists' => ['field' => $this->getField()]];
     }
-
 
     /**
      * @param string $field
@@ -31,7 +29,6 @@ class ExistsQuery extends AbstractQuery
         $this->field = $field;
         return $this;
     }
-
 
     /**
      * @return string

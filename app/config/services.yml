@@ -6,6 +6,11 @@ services:
     autowire: true
     arguments: [ '@doctrine', '@request_stack', '@?logger', { content: 'Search for string in all fields' } ]
     tags: [ { name: 'api_platform.filter', id: 'SearchFilter' } ]
+  document.filter.searchfilter:
+    class: 'AppBundle\Filter\SearchFilterInterface'
+    autowire: true
+    arguments: [ '@doctrine', '@request_stack', '@?logger', { content: 'Search for string in all fields' } ]
+    tags: [ { name: 'api_platform.filter', id: 'NewSearchFilter' } ]
   document.filter.page:
     class: 'AppBundle\Filter\PageFilter'
     autowire: true
@@ -15,7 +20,7 @@ services:
     class: 'AppBundle\DataProvider\DocumentCollectionDataProvider'
     public: true
     autowire: true
-    arguments: ['@request_stack', '@api_platform.metadata.resource.metadata_factory', '%api_platform.collection.pagination.items_per_page%']
+    arguments: ['@request_stack', '@api_platform.metadata.resource.metadata_factory', '%api_platform.collection.pagination.items_per_page%', '@document.filter.searchfilter']
     tags:
       -  { name: 'api_platform.collection_data_provider' }
   document.item_data_provider:

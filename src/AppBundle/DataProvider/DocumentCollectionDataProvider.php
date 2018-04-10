@@ -10,6 +10,9 @@ use Elasticsearch\ClientBuilder;
 use Nord\ElasticsearchBundle\ElasticsearchService;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+use AppBundle\Filter\SearchFilterInterface;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+
 final class DocumentCollectionDataProvider implements CollectionDataProviderInterface
 {
 
@@ -33,13 +36,15 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
      */
     private $service;
 
+    private $searchFilter;
+
     /**
      * DocumentCollectionDataProvider constructor.
      * @param RequestStack $requestStack
      * @param ResourceMetadataFactoryInterface $resourceMetadataFactory
      * @param Int $paginationItemsPerPage
      */
-    public function __construct(RequestStack $requestStack, ResourceMetadataFactoryInterface $resourceMetadataFactory, $paginationItemsPerPage)
+    public function __construct(RequestStack $requestStack, ResourceMetadataFactoryInterface $resourceMetadataFactory, $paginationItemsPerPage, $searchFilter)
     {
         $this->requestStack = $requestStack;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -48,6 +53,8 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
         $client = ClientBuilder::create()->build();
         $this->client = $client;
         $this->service = new ElasticsearchService($client);
+
+        $this->searchFilter = $searchFilter;
     }
 
     /**
@@ -61,13 +68,17 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
         $request = $this->requestStack->getCurrentRequest();
 
         $queryBuilder = $this->service->createQueryBuilder();
-        $query = $queryBuilder->createBoolQuery();
 
-        if ($param = $request->query->get('search')) {
-            $query->addMust(
-                $queryBuilder->createQueryStringQuery()
-                    ->setQuery('"' . strtolower($param) . '"'));
-        }
+        $queryNameGenerator = new QueryNameGenerator();
+
+        $query = $queryBuilder->createBoolQuery();
+        $this->searchFilter->apply($query, $queryNameGenerator, $resourceClass);
+
+        // if ($param = $request->query->get('search')) {
+        //     $query->addMust(
+        //         $queryBuilder->createQueryStringQuery()
+        //             ->setQuery('"' . strtolower($param) . '"'));
+        // }
 
         if ($language = $request->query->get('language')) {
             $query->addMust(

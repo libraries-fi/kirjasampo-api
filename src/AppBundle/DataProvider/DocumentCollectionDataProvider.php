@@ -72,7 +72,7 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
         $queryNameGenerator = new QueryNameGenerator();
 
         $query = $queryBuilder->createBoolQuery();
-        $this->searchFilter->apply($query, $queryNameGenerator, $resourceClass);
+        $this->searchFilter->apply($request, false, $attributes, $context);
 
         // if ($param = $request->query->get('search')) {
         //     $query->addMust(

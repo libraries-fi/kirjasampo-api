@@ -2,17 +2,18 @@
 
 namespace AppBundle\Filter;
 
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\FilterInterface;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use Doctrine\ORM\QueryBuilder;
+use ApiPlatform\Core\Serializer\Filter\FilterInterface;
+use Symfony\Component\HttpFoundation\Request;
 
-final class SearchFilterInterface implements FilterInterface
+class SearchFilterInterface implements FilterInterface
 {
-    public function apply(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null) {
+
+    public function apply(Request $request, bool $normalization, array $attributes, array &$context)
+    {
 
     }
 
-    public function getDescription(string $resourceClass): array
+    public function getDescription(string $resourceClass) : array
     {
         $description = [];
         return $description;

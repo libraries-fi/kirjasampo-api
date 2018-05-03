@@ -67,31 +67,7 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        $queryBuilder = $this->service->createQueryBuilder();
-
-        $queryNameGenerator = new QueryNameGenerator();
-
-        $query = $queryBuilder->createBoolQuery();
-        $this->searchFilter->apply($request, false, $attributes, $context);
-
-        // if ($param = $request->query->get('search')) {
-        //     $query->addMust(
-        //         $queryBuilder->createQueryStringQuery()
-        //             ->setQuery('"' . strtolower($param) . '"'));
-        // }
-
-        if ($language = $request->query->get('language')) {
-            $query->addMust(
-                $queryBuilder->createQueryStringQuery()
-                    ->setFields(["*.@language"])
-                    ->setQuery($language)
-            );
-        }
-
-        $query->addMust(
-            $queryBuilder->createExistsQuery()
-                ->setField('*.@type')
-        );
+        $query = $this->searchFilter->applyWithQuery($request, $this->service->createQueryBuilder());
 
         $search = $this->service->createSearch()
             ->setIndex('kirjasampo')

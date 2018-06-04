@@ -11,6 +11,9 @@ use Nord\ElasticsearchBundle\ElasticsearchService;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 use AppBundle\Filter\SearchFilterInterface;
+
+use AppBundle\Filter\SearchFilterExtension;
+
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 
 final class DocumentCollectionDataProvider implements CollectionDataProviderInterface
@@ -36,7 +39,7 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
      */
     private $service;
 
-    private $searchFilter;
+    private $searchExtensions;
 
     /**
      * DocumentCollectionDataProvider constructor.
@@ -44,7 +47,7 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
      * @param ResourceMetadataFactoryInterface $resourceMetadataFactory
      * @param Int $paginationItemsPerPage
      */
-    public function __construct(RequestStack $requestStack, ResourceMetadataFactoryInterface $resourceMetadataFactory, $paginationItemsPerPage, $searchFilter)
+    public function __construct(RequestStack $requestStack, ResourceMetadataFactoryInterface $resourceMetadataFactory, $paginationItemsPerPage, $searchExtensions)
     {
         $this->requestStack = $requestStack;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -54,7 +57,7 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
         $this->client = $client;
         $this->service = new ElasticsearchService($client);
 
-        $this->searchFilter = $searchFilter;
+        $this->searchExtensions = $searchExtensions;
     }
 
     /**
@@ -66,8 +69,11 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
     public function getCollection(string $resourceClass, string $operationName = null)
     {
         $request = $this->requestStack->getCurrentRequest();
+        $query = $this->service->createQueryBuilder()->createBoolQuery();
 
-        $query = $this->searchFilter->applyWithQuery($request, $this->service->createQueryBuilder());
+        foreach ($this->searchExtensions as $extension) {
+            $extension->applyToCollection($request, $this->service->createQueryBuilder(), $query);
+        }
 
         $search = $this->service->createSearch()
             ->setIndex('kirjasampo')

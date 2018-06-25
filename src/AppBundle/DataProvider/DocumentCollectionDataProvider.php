@@ -71,9 +71,9 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
         $request = $this->requestStack->getCurrentRequest();
         $query = $this->service->createQueryBuilder()->createBoolQuery();
 
-        foreach ($this->searchExtensions as $extension) {
-            $extension->applyToCollection($request, $this->service->createQueryBuilder(), $query);
-        }
+        // foreach ($this->searchExtensions as $extension) {
+        //     $extension->applyToCollection($request, $this->service->createQueryBuilder(), $query);
+        // }
 
         $search = $this->service->createSearch()
             ->setIndex('kirjasampo')

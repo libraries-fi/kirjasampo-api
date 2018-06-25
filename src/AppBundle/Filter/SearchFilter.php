@@ -10,7 +10,10 @@ final class SearchFilter extends AbstractFilter
 {
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
-
+      $parameterName = $queryNameGenerator->generateParameterName($property);
+      $queryBuilder
+            ->andWhere(sprintf('REGEXP(o.%s, :%s) = 1', 'content', $parameterName))
+            ->setParameter($parameterName, $value);
     }
 
     // This function is only used to hook in documentation generators (supported by Swagger and Hydra)

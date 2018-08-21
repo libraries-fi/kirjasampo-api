@@ -8,6 +8,11 @@ use Doctrine\ORM\QueryBuilder;
 
 final class SearchFilter extends AbstractFilter
 {
+    // this function should be call automatically to handle the process of search
+    // there are annotation in Document.php, but unfortunately this function isn't called at all,
+    // but without this class and annotation the field "Search for string in all fields" are not exist.
+    // So the application gets some inforametion to create design, but doesn't run this function - the reason aren't known.
+    // now the process of filtering data uses extensions in DocumentCollectionDataProvider.php
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, string $operationName = null)
     {
       $parameterName = $queryNameGenerator->generateParameterName($property);

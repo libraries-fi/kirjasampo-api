@@ -71,9 +71,15 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
         $request = $this->requestStack->getCurrentRequest();
         $query = $this->service->createQueryBuilder()->createBoolQuery();
 
-        // foreach ($this->searchExtensions as $extension) {
-        //     $extension->applyToCollection($request, $this->service->createQueryBuilder(), $query);
-        // }
+        // this code one by one run the filters to add necessary data for query
+        // extensions are - SearchFilterExtension.php, LanguageFilterExtension.php, TypeFilterExtension.php
+        // they are written in services.yml and transfered like constructor arguments to this class
+        // to add new extension - implement ExtensionInterface, write the enitity in services.yml
+        // and pass it to the constructor also in serives.yml to document.collection_data_provider
+        // this cycle should be commented out if application will run filter functions from annotated filters like SearchFilter.php
+        foreach ($this->searchExtensions as $extension) {
+            $extension->applyToCollection($request, $this->service->createQueryBuilder(), $query);
+        }
 
         $search = $this->service->createSearch()
             ->setIndex('kirjasampo')

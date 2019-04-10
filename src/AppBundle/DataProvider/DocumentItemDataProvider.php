@@ -28,7 +28,6 @@ final class DocumentItemDataProvider implements ItemDataProviderInterface
     public function __construct(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
-
         $client        = ClientBuilder::create()->build();
         $this->service = new ElasticsearchService($client);
     }
@@ -65,7 +64,9 @@ final class DocumentItemDataProvider implements ItemDataProviderInterface
             }
             $relatedDocuments = new GetRelatedDocument($result[0]);
             $relatedDocuments = $relatedDocuments->getRelatedDocuments();
-            $result[0]['_source']['@relatedDocuments'] = $relatedDocuments;
+
+            if ($relatedDocuments)
+                $result[0]['_source']['@relatedDocuments'] = $relatedDocuments;
 
             return new Document($result[0]['_id'], $result[0]['_source']);
         } else {

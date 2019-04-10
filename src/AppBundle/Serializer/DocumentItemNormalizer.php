@@ -45,7 +45,16 @@ class DocumentItemNormalizer implements NormalizerInterface
         $data['@id'] = $object->getId();
         $data['@type'] = $resourceMetadata->getIri() ?: $resourceMetadata->getShortName();
 
+        $releatedDocuments = [];
+
         $result = $object->getContent();
+
+        if (isset($object->getContent()['@relatedDocuments'])){
+            foreach ($object->getContent()['@relatedDocuments'] as $doc)
+                $releatedDocuments [] = $this->normalize($doc);
+            $result['@relatedDocuments'] = $releatedDocuments;
+        }
+
         return $data + $result;
     }
 

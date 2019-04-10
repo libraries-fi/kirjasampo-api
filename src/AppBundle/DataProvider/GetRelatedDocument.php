@@ -38,10 +38,15 @@ class GetRelatedDocument
 
         foreach ($this->source as $key => $value) {
             if (preg_match($relatedPattern, $key)) {
-                if (!in_array($key, $relatedIDs))
-                    $relatedIDs [] = $key;
+                foreach ($value as $item) {
+                    if (array_key_exists('@id', $item)) {
+                        array_push($relatedIDs, $item['@id']);
+                    }
+                }
             }
         }
+
+        $relatedIDs = array_unique($relatedIDs);
 
         foreach ($relatedIDs as $id) {
             array_push($params['body']['docs'], [
@@ -59,7 +64,7 @@ class GetRelatedDocument
 
             foreach ($response['docs'] as $doc) {
                 $docObj = new Document($doc['_id'], $doc['_source']);
-                $result [] = $docObj->getContent();
+                $result [] = $docObj;
             }
         }
 

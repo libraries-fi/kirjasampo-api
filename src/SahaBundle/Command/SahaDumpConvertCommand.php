@@ -57,6 +57,10 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
                         '_type'  => 'item',
                     ],
                 ];
+
+                if (count((array)$graph) == 1)
+                    continue;
+
                 if( isset($graph['@id'])){
                     $action['index']['_id'] = $graph['@id'];
                 }

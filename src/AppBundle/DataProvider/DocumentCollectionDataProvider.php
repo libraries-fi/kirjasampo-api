@@ -85,74 +85,13 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
         $search = $this->service->createSearch()
             ->setIndex('kirjasampo')
             ->setType('item')
-            ->setQuery($query);
+            ->setQuery($query)
+            ->setSize((int) $this->getItemsPerPage($resourceClass))
+            ->setPage((int) $request->query->get('page'));
 
         $result = $this->service->execute($search);
-        $sliceArguments = $this->customPagination($resourceClass);
-        $hits = array_slice($this->fetchRelatedDocuments($result)['hits']['hits'], $sliceArguments['from'], $sliceArguments['to']);
-
-        $result['hits']['hits'] = $hits;
 
         return $this->convertResult($result);
-    }
-
-    /**
-     * Fetching related resources
-     *
-     * @param $data
-     * @return mixed
-     */
-    public function fetchRelatedDocuments($data)
-    {
-        $prefix = array(
-            "ketjutettu_asiasana", "worldPlace", "sivuUrl", "hasReview", "eSampo", "tekija", "manifests_in",
-            "manifests_in_part", "kansikuva", "tiedostoUrl", "ilmestymisvuosi", "inverseProperty", "kaantaja",
-            "sarjaInstanssi", "palkintosarja", "hasAward"
-        );
-
-        $params = [
-            'body' => [
-                'docs' => [
-
-                ]
-            ]
-        ];
-
-        $relatedIDs = array();
-        //collect id's of related resources
-        for ($i = 0; $i < count($data['hits']['hits']); $i++) {
-            $source = $data['hits']['hits'][$i]['_source'];
-            foreach ($source as $key => $value) {
-                $splittedByHash = explode('#', $key);
-                $splittedBySlash = explode('/', $key);
-                if (in_array(end($splittedByHash), $prefix) || in_array(end($splittedBySlash), $prefix)) {
-                    foreach ($value as $item) {
-                        if (array_key_exists('@id', $item)) {
-                            array_push($relatedIDs, $item['@id']);
-                        }
-                    }
-                }
-            }
-        }
-        $relatedIDs = array_unique($relatedIDs);
-        foreach ($relatedIDs as $id) {
-            array_push($params['body']['docs'], [
-                '_index' => 'kirjasampo',
-                '_type' => 'item',
-                '_id' => $id
-            ]);
-        }
-
-        //make only one mget to fetching data
-        if (!empty($params['body']['docs'])) {
-            $response = $this->client->mget($params);
-            $response['docs'] = array_filter($response['docs'], function ($document) {
-                return isset($document['_source']);
-            });
-            $merged = array_merge($data['hits']['hits'], $response['docs']);
-            $data['hits']['hits'] = $merged;
-        }
-        return $data;
     }
 
     /**
@@ -170,6 +109,12 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
                 $resultItem['_source']['@contentType'] = $resultItem['_source']['@type'];
             }
 
+            $relatedDocuments = new GetRelatedDocument($resultItem);
+            $relatedDocuments = $relatedDocuments->getRelatedDocuments();
+
+            if ($relatedDocuments)
+                $resultItem['_source']['@relatedDocuments'] = $relatedDocuments;
+
             $entities[] = new Document($resultItem['_id'], $resultItem['_source']);
         }
 
@@ -177,24 +122,23 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
     }
 
     /**
-     * Get arguments for array_slice
+     * Get items per page count
      *
      * @param string $resourceClass
-     * @return array
+     * @return Int
      */
-    public function customPagination($resourceClass)
+    private function getItemsPerPage($resourceClass)
     {
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
-
         $paginationItemsPerPage = $resourceMetadata->getAttribute('pagination_items_per_page');
+
         $request = $this->requestStack->getCurrentRequest();
-        $page = $request->query->get('page');
+
         if ($param = $request->query->get('itemsPerPage')) {
             $paginationItemsPerPage = $param;
         }
-        --$page;
 
-        return array('from' => $page * $paginationItemsPerPage, 'to' => $paginationItemsPerPage);
+        return ($paginationItemsPerPage > 0) ? $paginationItemsPerPage : $this->paginationItemsPerPage;
     }
 
 }

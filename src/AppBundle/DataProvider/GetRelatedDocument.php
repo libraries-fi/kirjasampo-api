@@ -7,25 +7,11 @@ use Elasticsearch\ClientBuilder;
 
 class GetRelatedDocument
 {
-
-    private $client;
-
     /**
-     * @var object
+     * @param $document
+     * @return array
      */
-    private $source;
-
-    /**
-     * GetRelatedDocument constructor.
-     * @param object $document
-     */
-    public function __construct($document)
-    {
-        $this->source = $document['_source'];
-        $this->client = ClientBuilder::create()->build();
-    }
-
-    public function getRelatedDocuments()
+    public static function getRelatedDocuments($document)
     {
         $relatedPattern = "/ketjutettu_asiasana|worldPlace|sivuUrl|hasReview|eSampo|tekija|
                            manifests_in|manifests_in_part|kansikuva|tiedostoUrl|ilmestymisvuosi|
@@ -36,7 +22,7 @@ class GetRelatedDocument
         $relatedIDs = [];
         $result = [];
 
-        foreach ($this->source as $key => $value) {
+        foreach ($document['_source'] as $key => $value) {
             if (preg_match($relatedPattern, $key)) {
                 foreach ($value as $item) {
                     if (array_key_exists('@id', $item)) {
@@ -57,7 +43,7 @@ class GetRelatedDocument
         }
 
         if (!empty($params['body']['docs'])) {
-            $response = $this->client->mget($params);
+            $response = ClientBuilder::create()->build()->mget($params);
             $response['docs'] = array_filter($response['docs'], function ($document) {
                 return isset($document['_source']);
             });

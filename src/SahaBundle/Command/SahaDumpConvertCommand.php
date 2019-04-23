@@ -3,6 +3,7 @@
 namespace SahaBundle\Command;
 
 use ML\JsonLD\JsonLD;
+use SahaBundle\Configuration\Configuration;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,6 +12,8 @@ use EasyRdf_Graph;
 
 class SahaDumpConvertCommand extends ContainerAwareCommand
 {
+    protected $relatedMap;
+    protected $relatedIdsRegexp;
 
     protected function configure()
     {
@@ -18,6 +21,10 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
             ->setName('saha:dump:convert')
             ->setDescription('Convert files created with saha:dump:split into JSON')
             ->addArgument('file', InputArgument::REQUIRED, 'A path to the .nq dump file');
+
+        $configuration = new Configuration();
+        $this->relatedMap = $configuration->getRelatedResourceMap();
+        $this->relatedIdsRegexp = $configuration->getRelatedResourceRegexp();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -64,8 +71,14 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
                 if( isset($graph['@id'])){
                     $action['index']['_id'] = $graph['@id'];
                 }
-                $line = json_encode($action);
 
+                foreach ($graph as $key => $resources)
+                    if ($key != '@id' && $key != '@value' && preg_match($this->relatedIdsRegexp, $key))
+                        foreach ($resources as $resource)
+                            if (isset($resource['@id']))
+                                $graph['@related'][] = $resource['@id'];
+
+                $line = json_encode($action, JSON_UNESCAPED_SLASHES);
 
                 // Separate the action and document with a new line.
                 $line .= PHP_EOL;

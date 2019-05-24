@@ -33,7 +33,7 @@ class DocumentItemNormalizer implements NormalizerInterface
 
     public function normalize($object, $format = null, array $context = [])
     {
-
+        $relatedDocuments = [];
         $resourceClass = $this->resourceClassResolver->getResourceClass($object, $context['resource_class'] ?? null, true);
         $resourceMetadata = $this->resourceMetadataFactory->create($resourceClass);
 
@@ -45,14 +45,12 @@ class DocumentItemNormalizer implements NormalizerInterface
         $data['@id'] = $object->getId();
         $data['@type'] = $resourceMetadata->getIri() ?: $resourceMetadata->getShortName();
 
-        $releatedDocuments = [];
-
         $result = $object->getContent();
 
-        if (isset($object->getContent()['@relatedDocuments'])){
-            foreach ($object->getContent()['@relatedDocuments'] as $doc)
-                $releatedDocuments [] = $this->normalize($doc);
-            $result['@relatedDocuments'] = $releatedDocuments;
+        if (isset($object->getContent()['@relatedResources'])) {
+            foreach ($object->getContent()['@relatedResources'] as $doc)
+                $relatedDocuments [] = gettype($doc) == "object" ? $this->normalize($doc) : $doc;
+            $result['@relatedResources'] = $relatedDocuments;
         }
 
         return $data + $result;

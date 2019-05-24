@@ -8,23 +8,30 @@ use Elasticsearch\ClientBuilder;
 class GetRelatedDocument
 {
     /**
-     * @param $relatedIds
-     * @return array|null
+     * @param $resources
+     * @return array
      */
-    public static function getRelatedDocuments($relatedIds)
+    public static function getRelatedDocuments($resources)
     {
+        $ids = [];
+        $result = [];
         $params = ['body' => ['docs' => []]];
 
-        if ($relatedIds)
-            foreach ($relatedIds as $id) {
-                array_push($params['body']['docs'], [
-                    '_index' => 'kirjasampo',
-                    '_type' => 'item',
-                    '_id' => $id
-                ]);
-            }
-        else
-            return null;
+        foreach ($resources as $items) {
+            foreach ($items as $type => $resource)
+                if ($type == "@id")
+                    $ids[] = $resource;
+                else
+                    $result[] = [$type => $resource];
+        }
+
+        foreach ($ids as $id) {
+            $params['body']['docs'] [] = [
+                '_index' => 'kirjasampo',
+                '_type' => 'item',
+                '_id' => $id
+            ];
+        }
 
         if (!empty($params['body']['docs'])) {
             $response = ClientBuilder::create()->build()->mget($params);
@@ -38,6 +45,6 @@ class GetRelatedDocument
             }
         }
 
-        return $result ?? null;
+        return $result;
     }
 }

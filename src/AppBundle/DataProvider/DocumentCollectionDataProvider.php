@@ -51,10 +51,10 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
     }
 
     /**
-     * @param string      $resourceClass
+     * @param string $resourceClass
      * @param string|null $operationName
-     *
-     * @return mixed
+     * @return \ApiPlatform\Core\DataProvider\PaginatorInterface|array|\Traversable
+     * @throws \ApiPlatform\Core\Exception\ResourceClassNotFoundException
      */
     public function getCollection(string $resourceClass, string $operationName = null)
     {
@@ -96,7 +96,6 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
 
     /**
      * Convert the elasticsearch results to Documents
-     *
      * @param $result
      * @return array
      */
@@ -109,12 +108,8 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
                 $resultItem['_source']['@contentType'] = $resultItem['_source']['@type'];
             }
 
-            if(isset($resultItem['_source']['@related'])) {
-                $relatedDocuments =  GetRelatedDocument::getRelatedDocuments($resultItem['_source']['@related']);
-
-                if ($relatedDocuments)
-                    $resultItem['_source']['@relatedDocuments'] = $relatedDocuments;
-            }
+            if(isset($resultItem['_source']['@relatedResources']))
+                $resultItem['_source']['@relatedResources'] = GetRelatedDocument::getRelatedDocuments($resultItem['_source']['@relatedResources']);
 
             $entities[] = new Document($resultItem['_id'], $resultItem['_source']);
         }
@@ -124,9 +119,9 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
 
     /**
      * Get items per page count
-     *
-     * @param string $resourceClass
-     * @return Int
+     * @param $resourceClass
+     * @return Int|mixed|String
+     * @throws \ApiPlatform\Core\Exception\ResourceClassNotFoundException
      */
     private function getItemsPerPage($resourceClass)
     {

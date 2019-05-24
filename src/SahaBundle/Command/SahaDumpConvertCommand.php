@@ -3,7 +3,7 @@
 namespace SahaBundle\Command;
 
 use ML\JsonLD\JsonLD;
-use SahaBundle\Configuration\Configuration;
+use SahaBundle\RelatedResources\RelatedResourcesBuilder;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,9 +12,6 @@ use EasyRdf_Graph;
 
 class SahaDumpConvertCommand extends ContainerAwareCommand
 {
-    protected $relatedMap;
-    protected $relatedIdsRegexp;
-
     protected function configure()
     {
         $this
@@ -22,15 +19,15 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
             ->setDescription('Convert files created with saha:dump:split into JSON')
             ->addArgument('file', InputArgument::REQUIRED, 'A path to the .nq dump file');
 
-        $configuration = new Configuration();
-        $this->relatedMap = $configuration->getRelatedResourceMap();
-        $this->relatedIdsRegexp = $configuration->getRelatedResourceRegexp();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $sourceFile = $input->getArgument('file');
         $targetFile = dirname($sourceFile) . DIRECTORY_SEPARATOR . basename($sourceFile, '.nq') . '.json';
+
+        $mapBuilder = new RelatedResourcesBuilder($input, $output);
+        $relatedMap = $mapBuilder->getRelatedResources();
 
         if ( ! is_writable(dirname($targetFile))) {
             $output->writeln(
@@ -70,13 +67,9 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
 
                 if( isset($graph['@id'])){
                     $action['index']['_id'] = $graph['@id'];
+                    if (isset($relatedMap[$graph['@id']]))
+                        $graph['@relatedResources'] = $relatedMap[$graph['@id']];
                 }
-
-                foreach ($graph as $key => $resources)
-                    if ($key != '@id' && $key != '@value' && preg_match($this->relatedIdsRegexp, $key))
-                        foreach ($resources as $resource)
-                            if (isset($resource['@id']))
-                                $graph['@related'][] = $resource['@id'];
 
                 $line = json_encode($action, JSON_UNESCAPED_SLASHES);
 

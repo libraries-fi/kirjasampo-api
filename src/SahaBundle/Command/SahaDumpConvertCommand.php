@@ -3,7 +3,7 @@
 namespace SahaBundle\Command;
 
 use ML\JsonLD\JsonLD;
-use SahaBundle\RelatedResources\RelatedResourcesBuilder;
+use SahaBundle\LinkedData\LinksBuilder;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,10 +26,9 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
         $sourceFile = $input->getArgument('file');
         $targetFile = dirname($sourceFile) . DIRECTORY_SEPARATOR . basename($sourceFile, '.nq') . '.json';
 
-        $mapBuilder = new RelatedResourcesBuilder($input, $output);
-        $relatedMap = $mapBuilder->getRelatedResources();
+        $links = new LinksBuilder($input, $output);
 
-        if ( ! is_writable(dirname($targetFile))) {
+        if (!is_writable(dirname($targetFile))) {
             $output->writeln(
                 '<comment>The target directory ' . dirname($targetFile) . ' is not writable.
                 Writing to system temporary directory instead.</comment>'
@@ -39,7 +38,7 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
         }
 
         $triplesCount = 0;
-        $fileNumber   = 0;
+        $fileNumber = 0;
 
         // Add a left padding of 4 zeroes required by the split command.
         while (file_exists($sourceFile . str_pad($fileNumber, 4, '0', STR_PAD_LEFT))) {
@@ -65,10 +64,9 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
                 if (count((array)$graph) == 1)
                     continue;
 
-                if( isset($graph['@id'])){
+                if(isset($graph['@id'])){
                     $action['index']['_id'] = $graph['@id'];
-                    if (isset($relatedMap[$graph['@id']]))
-                        $graph['@relatedResources'] = $relatedMap[$graph['@id']];
+                    $graph['@relatedResources'] = $links->getLinkedData($graph['@id']);
                 }
 
                 $line = json_encode($action, JSON_UNESCAPED_SLASHES);

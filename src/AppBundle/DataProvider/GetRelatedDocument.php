@@ -17,12 +17,11 @@ class GetRelatedDocument
         $result = [];
         $params = ['body' => ['docs' => []]];
 
+        if (!count($resources))
+            return [];
+
         foreach ($resources as $items) {
-            foreach ($items as $type => $resource)
-                if ($type == "@id")
-                    $ids[] = $resource;
-                else
-                    $result[] = [$type => $resource];
+            $ids[] = $items;
         }
 
         foreach ($ids as $id) {

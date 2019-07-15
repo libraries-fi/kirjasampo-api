@@ -62,8 +62,7 @@ final class DocumentItemDataProvider implements ItemDataProviderInterface
                 $resultItem['_source']['@contentType'] = $resultItem['_source']['@type'];
             }
 
-            if(isset($result[0]['_source']['@relatedResources']))
-                $result[0]['_source']['@relatedResources'] = GetRelatedDocument::getRelatedDocuments($result[0]['_source']['@relatedResources']);
+            $result[0]['_source']['@relatedResources'] = GetRelatedDocument::getRelatedDocuments($result[0]['_source']['@relatedResources']);
 
             return new Document($result[0]['_id'], $result[0]['_source']);
         } else {

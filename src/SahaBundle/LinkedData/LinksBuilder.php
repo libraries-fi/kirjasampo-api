@@ -5,6 +5,7 @@ namespace SahaBundle\LinkedData;
 use EasyRdf_Graph;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Validator\Constraints\Length;
 
 class LinksBuilder
 {
@@ -33,9 +34,9 @@ class LinksBuilder
             $data = new EasyRdf_Graph();
             $data->parseFile($this->sourceFile . $fileSuffix, 'ntriples');
 
-            $data = json_decode($data->serialise('jsonld'), true);
+            $resources = json_decode($data->serialise('jsonld'), true);
 
-            foreach ($data as $resource) {
+            foreach ($resources as $resource) {
                 if (isset($resource['@id'])) {
                     $res = new Resource($resource['@id'], $this->config, $this->output, $this->links, $availableProps);
                     $res->fill($resource);

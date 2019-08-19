@@ -51,9 +51,9 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
 
             $triplesCount += $data->countTriples();
 
-            $data = json_decode($data->serialise('jsonld'), true);
+            $resources = json_decode($data->serialise('jsonld'), true);
 
-            foreach ($data as $graph) {
+            foreach ($resources as $resource) {
                 $action = [
                     'index' => [
                         '_index' => 'kirjasampo',
@@ -61,12 +61,22 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
                     ],
                 ];
 
-                if (count((array)$graph) == 1)
+                if (count((array)$resource) == 1)
                     continue;
 
-                if(isset($graph['@id'])){
-                    $action['index']['_id'] = $graph['@id'];
-                    $graph['@relatedResources'] = $links->getLinkedData($graph['@id']);
+                if(isset($resource['@id'])){
+                    $action['index']['_id'] = $resource['@id'];
+                    $resource['@relatedResources'] = $links->getLinkedData($resource['@id']);
+
+                    $meta = [];
+
+                    array_map(function ($item) use (&$meta) {
+                        $res = explode(':', $item);
+                        $meta[$res[0]] = $res[1];
+                    }, 
+                    $data->properties($resource['@id']));
+                    
+                    $resource['meta'] = $meta;
                 }
 
                 $line = json_encode($action, JSON_UNESCAPED_SLASHES);
@@ -74,7 +84,7 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
                 // Separate the action and document with a new line.
                 $line .= PHP_EOL;
 
-                $line .= JsonLD::toString($graph);
+                $line .= JsonLD::toString($resource);
 
                 // End the current document with a new line.
                 $line .= PHP_EOL;

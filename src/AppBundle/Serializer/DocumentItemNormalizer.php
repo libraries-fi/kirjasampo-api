@@ -47,10 +47,10 @@ class DocumentItemNormalizer implements NormalizerInterface
 
         $result = $object->getContent();
 
-        if (isset($object->getContent()['@relatedResources'])) {
-            foreach ($object->getContent()['@relatedResources'] as $doc)
+        if (isset($object->getContent()['fullRelatedResources'])) {
+            foreach ($object->getContent()['fullRelatedResources'] as $doc)
                 $relatedDocuments [] = gettype($doc) == "object" ? $this->normalize($doc) : $doc;
-            $result['@relatedResources'] = $relatedDocuments;
+            $result['fullRelatedResources'] = $relatedDocuments;
         }
 
         return $data + $result;

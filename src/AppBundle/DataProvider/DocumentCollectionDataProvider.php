@@ -108,7 +108,7 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
                 $resultItem['_source']['@contentType'] = $resultItem['_source']['@type'];
             }
 
-            $resultItem['_source']['@relatedResources'] = GetRelatedDocument::getRelatedDocuments($resultItem['_source']['@relatedResources']);
+            $resultItem['_source']['fullRelatedResources'] = GetRelatedDocument::getRelatedDocuments($resultItem['_source']['relatedResourcesList']);
 
             $entities[] = new Document($resultItem['_id'], $resultItem['_source']);
         }

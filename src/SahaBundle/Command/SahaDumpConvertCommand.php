@@ -66,7 +66,7 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
 
                 if(isset($resource['@id'])){
                     $action['index']['_id'] = $resource['@id'];
-                    $resource['@relatedResources'] = $links->getLinkedData($resource['@id']);
+                    $resource['relatedResourcesList'] = $links->getLinkedData($resource['@id']);
 
                     $meta = [];
 

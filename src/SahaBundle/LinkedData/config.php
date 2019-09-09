@@ -74,6 +74,7 @@ return [
         'http://www.yso.fi/onto/kaunokki#manifests_in',
         'http://www.yso.fi/onto/kaunokki#manifests_in_part',
         'path' => [
+            'all' => true,
             'http://www.yso.fi/onto/kaunokki#kansikuva'
         ]
     ],
@@ -120,6 +121,7 @@ return [
         'http://www.yso.fi/onto/kaunokki#palkintosarja',
         'path' => [
             'inverse' => true,
+            'all' => true,
             'http://www.yso.fi/onto/kaunokki#onPalkinto',
             'http://www.yso.fi/onto/kaunokki#hasAward'
         ]

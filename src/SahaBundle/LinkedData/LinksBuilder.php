@@ -62,6 +62,7 @@ class Resource
     protected $config;
     protected $output;
     protected $props = [];
+    protected $propsAll = [];
     protected $linkedData = [];
     protected $inverseProps = [];
     protected $availableProps = [];
@@ -121,11 +122,17 @@ class Resource
         $result = [];
         $path = isset($_path['path']) ? $_path['path'] : [];
         $inverse = isset($_path['inverse']);
+        $all = isset($_path['all']) ? $_path['all'] : false;
         $config = $_path ? $_path : $this->config;
         $properties = $inverse ? $this->inverseProps : $this->props;
 
         unset($_path['path']);
         unset($_path['inverse']);
+        unset($_path['all']);
+
+        if ($all) {
+            $result[] = $properties;
+        }
 
         if (!$_path) {
             foreach ($config as $configProperty)

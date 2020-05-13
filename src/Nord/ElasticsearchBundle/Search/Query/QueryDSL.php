@@ -1,7 +1,7 @@
 <?php namespace Nord\ElasticsearchBundle\Search\Query;
 
 /**
- * Elasticsearch provides a full Query DSL based on JSON to define queries.
+ * Elasticsearch provides a full Query DSL based on JSON-LD to define queries.
  * Think of the Query DSL as an AST of queries, consisting of two types of clauses:
  *
  * - "Leaf query clauses"

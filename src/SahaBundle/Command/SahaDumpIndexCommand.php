@@ -15,7 +15,7 @@ class SahaDumpIndexCommand extends ContainerAwareCommand
         $this
             ->setName('saha:dump:index')
             ->setDescription('Index files created with saha:dump:convert to Elasticsearch')
-            ->addArgument('file', InputArgument::OPTIONAL, 'The JSON file to index without the file number suffix');
+            ->addArgument('file', InputArgument::OPTIONAL, 'The JSON-LD file to index without the file number suffix');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

@@ -36,7 +36,7 @@
         "easyrdf/easyrdf": "^0.9.1",
         "elasticsearch/elasticsearch": "^2.1",
         "pagerfanta/pagerfanta": "^1.0",
-        "ml/json-ld": "^1.0"
+        "ml/json-ld": "^1.1"
     },
     "require-dev": {
         "api-platform/schema-generator": "^1.2",

@@ -55,8 +55,8 @@ conversion itself is done using EasyRdf. The library opens the first file (e.g. 
 and looks for all the lines that have the same subject and turns that into a JSON-LD object.
 Then it does it for the next lines with a different subject until all lines in that file are converted.
 Then it continues to the next file with a suffix of 0001 and so on. This command outputs files
-with the same name as the command above, except that the “nq” part is replaced with “json”,
-e.g. test-import-100000.json0000.
+with the same name as the command above, except that the “nq” part is replaced with “jsonld”,
+e.g. test-import-100000.jsonld0000.
 
 This command also adds an extra line to the dump before every JSON-LD object to make the
 data compatible with the Elasticsearch bulk API so that it can be indexed to ES in the next step.
@@ -75,7 +75,7 @@ the process might get killed while executing
 The last step is to index the data to Elasticsearch. This is a simple process because it’s just a
 wrapper for a terminal command.
 Example command:
-```php bin/console saha:dump:index /home/vagrant/test-import-1000000.json```
+```php bin/console saha:dump:index /home/vagrant/test-import-1000000.jsonld```
 
 # How the API works
 API Platform is built on top of Symfony (currently v3.2) so it works the same way. There are two

@@ -16,7 +16,7 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
     {
         $this
             ->setName('saha:dump:convert')
-            ->setDescription('Convert files created with saha:dump:split into JSON')
+            ->setDescription('Convert files created with saha:dump:split into JSON-LD')
             ->addArgument('file', InputArgument::REQUIRED, 'A path to the .nq dump file');
 
     }
@@ -24,7 +24,7 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $sourceFile = $input->getArgument('file');
-        $targetFile = dirname($sourceFile) . DIRECTORY_SEPARATOR . basename($sourceFile, '.nq') . '.json';
+        $targetFile = dirname($sourceFile) . DIRECTORY_SEPARATOR . basename($sourceFile, '.nq') . '.jsonld';
 
         $links = new LinksBuilder($input, $output);
 
@@ -34,7 +34,7 @@ class SahaDumpConvertCommand extends ContainerAwareCommand
                 Writing to system temporary directory instead.</comment>'
             );
 
-            $targetFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . basename($sourceFile, '.nq') . '.json';
+            $targetFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . basename($sourceFile, '.nq') . '.jsonld';
         }
 
         $triplesCount = 0;

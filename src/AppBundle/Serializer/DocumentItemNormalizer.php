@@ -42,10 +42,10 @@ class DocumentItemNormalizer implements NormalizerInterface
 
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
 
-        $data['@id'] = $object->getId();
-        $data['@type'] = $resourceMetadata->getIri() ?: $resourceMetadata->getShortName();
-
         $result = $object->getContent();
+
+        $data['@id'] = $object->getId();
+        $data['@type'] = $result['@contentType'][0] ?? $resourceMetadata->getIri() ?? $resourceMetadata->getShortName();
 
         if (isset($object->getContent()['fullRelatedResources'])) {
             foreach ($object->getContent()['fullRelatedResources'] as $doc)

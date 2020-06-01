@@ -45,7 +45,8 @@ class DocumentItemNormalizer implements NormalizerInterface
         $result = $object->getContent();
 
         $data['@id'] = $object->getId();
-        $data['@type'] = $result['@contentType'][0] ?? $resourceMetadata->getIri() ?? $resourceMetadata->getShortName();
+
+        $data['@type'] =  $result['@contentType'][0] ?? $result['@type'][0] ?? $resourceMetadata->getIri() ?? $resourceMetadata->getShortName();
 
         if (isset($object->getContent()['fullRelatedResources'])) {
             foreach ($object->getContent()['fullRelatedResources'] as $doc)

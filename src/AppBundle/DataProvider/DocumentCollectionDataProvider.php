@@ -10,6 +10,12 @@ use Elasticsearch\ClientBuilder;
 use Nord\ElasticsearchBundle\ElasticsearchService;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+use AppBundle\Filter\SearchFilterInterface;
+
+use AppBundle\Filter\SearchFilterExtension;
+
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
+
 final class DocumentCollectionDataProvider implements CollectionDataProviderInterface
 {
 
@@ -33,13 +39,15 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
      */
     private $service;
 
+    private $searchExtensions;
+
     /**
      * DocumentCollectionDataProvider constructor.
      * @param RequestStack $requestStack
      * @param ResourceMetadataFactoryInterface $resourceMetadataFactory
      * @param Int $paginationItemsPerPage
      */
-    public function __construct(RequestStack $requestStack, ResourceMetadataFactoryInterface $resourceMetadataFactory, $paginationItemsPerPage)
+    public function __construct(RequestStack $requestStack, ResourceMetadataFactoryInterface $resourceMetadataFactory, $paginationItemsPerPage, $searchExtensions)
     {
         $this->requestStack = $requestStack;
         $this->resourceMetadataFactory = $resourceMetadataFactory;
@@ -48,6 +56,8 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
         $client = ClientBuilder::create()->build();
         $this->client = $client;
         $this->service = new ElasticsearchService($client);
+
+        $this->searchExtensions = $searchExtensions;
     }
 
     /**
@@ -59,28 +69,17 @@ final class DocumentCollectionDataProvider implements CollectionDataProviderInte
     public function getCollection(string $resourceClass, string $operationName = null)
     {
         $request = $this->requestStack->getCurrentRequest();
+        $query = $this->service->createQueryBuilder()->createBoolQuery();
 
-        $queryBuilder = $this->service->createQueryBuilder();
-        $query = $queryBuilder->createBoolQuery();
-
-        if ($param = $request->query->get('search')) {
-            $query->addMust(
-                $queryBuilder->createQueryStringQuery()
-                    ->setQuery('"' . strtolower($param) . '"'));
+        // this code one by one run the filters to add necessary data for query
+        // extensions are - SearchFilterExtension.php, LanguageFilterExtension.php, TypeFilterExtension.php
+        // they are written in services.yml and transfered like constructor arguments to this class
+        // to add new extension - implement ExtensionInterface, write the enitity in services.yml
+        // and pass it to the constructor also in serives.yml to document.collection_data_provider
+        // this cycle should be commented out if application will run filter functions from annotated filters like SearchFilter.php
+        foreach ($this->searchExtensions as $extension) {
+            $extension->applyToCollection($request, $this->service->createQueryBuilder(), $query);
         }
-
-        if ($language = $request->query->get('language')) {
-            $query->addMust(
-                $queryBuilder->createQueryStringQuery()
-                    ->setFields(["*.@language"])
-                    ->setQuery($language)
-            );
-        }
-
-        $query->addMust(
-            $queryBuilder->createExistsQuery()
-                ->setField('*.@type')
-        );
 
         $search = $this->service->createSearch()
             ->setIndex('kirjasampo')

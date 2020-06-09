@@ -21,7 +21,7 @@ final class PageFilter extends AbstractFilter
         foreach ($this->properties as $property => $strategy) {
             $description[$property] = [
                 'property' => $property,
-                'type' => 'int',
+                'type' => $property == 'language' ? 'string' : 'int',
                 'required' => false,
                 'swagger' => ['description' => $strategy],
             ];

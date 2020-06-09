@@ -4,17 +4,10 @@ namespace AppBundle\DataProvider;
 
 use ApiPlatform\Core\DataProvider\CollectionDataProviderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
-use ApiPlatform\Core\Metadata\Resource\ResourceMetadata;
 use AppBundle\Entity\Document;
 use Elasticsearch\ClientBuilder;
 use Nord\ElasticsearchBundle\ElasticsearchService;
 use Symfony\Component\HttpFoundation\RequestStack;
-
-use AppBundle\Filter\SearchFilterInterface;
-
-use AppBundle\Filter\SearchFilterExtension;
-
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Util\QueryNameGenerator;
 
 final class DocumentCollectionDataProvider implements CollectionDataProviderInterface
 {

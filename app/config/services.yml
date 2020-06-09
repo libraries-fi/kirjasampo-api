@@ -24,7 +24,7 @@ services:
   document.filter.page:
     class: 'AppBundle\Filter\PageFilter'
     autowire: true
-    arguments: [ '@doctrine', '@request_stack', '@?logger', { itemsPerPage: 'How many items per page to display', page: 'Which page to show' } ]
+    arguments: [ '@doctrine', '@request_stack', '@?logger', { language: 'Search for language in all fields', itemsPerPage: 'How many items per page to display', page: 'Which page to show' } ]
     tags: [ { name: 'api_platform.filter', id: 'PageFilter' } ]
   document.collection_data_provider:
     class: 'AppBundle\DataProvider\DocumentCollectionDataProvider'

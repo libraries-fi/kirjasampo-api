@@ -464,7 +464,7 @@ class SymfonyRequirements extends RequirementCollection
         $this->addRequirement(
             function_exists('json_encode'),
             'json_encode() must be available',
-            'Install and enable the <strong>JSON-LD</strong> extension.'
+            'Install and enable the <strong>JSON</strong> extension.'
         );
 
         $this->addRequirement(

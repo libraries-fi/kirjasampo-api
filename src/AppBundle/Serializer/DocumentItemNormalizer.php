@@ -9,6 +9,7 @@ use ApiPlatform\Core\Exception\InvalidArgumentException;
 use ApiPlatform\Core\JsonLd\ContextBuilderInterface;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
 use ApiPlatform\Core\Serializer\ContextTrait;
+use ML\JsonLD\JsonLD;
 
 
 class DocumentItemNormalizer implements NormalizerInterface
@@ -41,7 +42,7 @@ class DocumentItemNormalizer implements NormalizerInterface
         $context['api_normalize'] = true;
 
         $data = $this->addJsonLdContext($this->contextBuilder, $resourceClass, $context);
-
+       
         $result = $object->getContent();
 
         $data['@id'] = $object->getId();
@@ -53,8 +54,30 @@ class DocumentItemNormalizer implements NormalizerInterface
                 $relatedDocuments [] = gettype($doc) == "object" ? $this->normalize($doc) : $doc;
             $result['fullRelatedResources'] = $relatedDocuments;
         }
+        
+        if (file_exists(__DIR__ . '/response.jsonld')) {
+            unlink (__DIR__ . '/response.jsonld');
+        }
+        // if (file_exists(__DIR__ . '/log.txt')) {
+        //     unlink (__DIR__ . '/log.txt');
+        // }
+        $line = json_encode($data + $result, JSON_UNESCAPED_SLASHES);
 
-        return $data + $result;
+        // file_put_contents( __DIR__ . '/response.jsonld', $data + $result, FILE_APPEND);
+        file_put_contents( __DIR__ . '/response.jsonld', JsonLD::toString($line). PHP_EOL, FILE_APPEND);
+
+        $config = json_decode(file_get_contents(__DIR__ . '/context-config.jsonld'));
+        $jsonld = json_decode(file_get_contents(__DIR__ . '/response.jsonld'));
+
+        if (isset($data['@context'])) {
+            return $data + $result;
+        }
+
+        $test = JsonLD::frame($jsonld, $config);
+        
+        // $log = date('Y-m-d H:i:s') . ' ' . print_r($data, true);
+        // file_put_contents(__DIR__ . '/log.txt', $log . PHP_EOL, FILE_APPEND);
+        return $test;
     }
 
     public function supportsNormalization($data, $format = null)

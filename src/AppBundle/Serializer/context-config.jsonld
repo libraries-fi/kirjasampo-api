@@ -1,0 +1,6 @@
+{
+  "@context": {
+    "t1": "http://example.com/t1",
+    "term1": "http://example.com/term1"
+  }
+}
